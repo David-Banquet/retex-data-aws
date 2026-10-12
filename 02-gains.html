@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Gains mesurés</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F5; --surface:#FFFFFF; --ink:#13201D; --muted:#55645F; --rule:#D3DCD8;
+  --accent:#0B6E5F; --accent-soft:#DDEFEA; --warn:#A4471B; --warn-soft:#F6E5DB;
+  --bronze:#9A6A2F; --silver:#6F7C86; --gold:#B08A12;
+  --code-bg:#E8EDEB;
+  --display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --ground:#0E1513; --surface:#151F1C; --ink:#E3ECE9; --muted:#97A8A2; --rule:#26332F;
+    --accent:#5CC9B4; --accent-soft:#16312B; --warn:#F09A6E; --warn-soft:#352015;
+    --bronze:#D3A266; --silver:#AAB6BF; --gold:#E2BE4A;
+    --code-bg:#1B2724;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 17px/1.65 var(--body);padding-inline:20px;padding-block:44px 88px}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:60px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(2.1rem,5.4vw,3.1rem);font-weight:800;letter-spacing:-.025em}
+h2{font-size:1.65rem;font-weight:700;letter-spacing:-.012em}
+h3{font-size:1.08rem;font-weight:700}
+p{margin:0}
+section{display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font:500 .74rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.18rem;color:var(--muted);max-width:62ch}
+code{font:400 .84em var(--mono);background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+pre{margin:0;background:var(--code-bg);border-radius:8px;padding:14px 16px;overflow-x:auto;font:400 .82rem/1.55 var(--mono)}
+pre code{background:none;padding:0;font-size:inherit}
+ul,ol{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:8px}
+b{font-weight:600}
+.layers{display:flex;gap:6px;flex-wrap:wrap;font:500 .78rem/1 var(--mono)}
+.layers span{padding:6px 10px;border-radius:4px;border:1px solid var(--rule);background:var(--surface)}
+.layers .b{color:var(--bronze)} .layers .s{color:var(--silver)} .layers .g{color:var(--gold)}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;font-family:var(--body)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font:500 .72rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-size:.86rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+.trap{border-left:3px solid var(--warn);background:var(--warn-soft);padding:12px 16px;border-radius:0 8px 8px 0;display:flex;flex-direction:column;gap:6px}
+.trap b{color:var(--warn)}
+.traps{display:flex;flex-direction:column;gap:12px}
+.kicker{font:700 .8rem/1 var(--display);letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+footer{color:var(--muted);font-size:.92rem;border-top:1px solid var(--rule);padding-top:20px;display:flex;flex-direction:column;gap:8px}
+
+.topnav{position:sticky;top:0;z-index:5;background:var(--ground);border-bottom:1px solid var(--rule);margin-inline:-20px;padding:10px 20px;overflow-x:auto}
+.topnav ol{list-style:none;margin:0 auto;padding:0;display:flex;gap:4px;flex-direction:row;max-width:760px;white-space:nowrap;font:500 .8rem/1 var(--display)}
+.topnav a{display:block;padding:7px 10px;border-radius:6px;color:var(--muted);text-decoration:none}
+.topnav a:hover,.topnav a:focus-visible{color:var(--ink);background:var(--surface)}
+.topnav a[aria-current]{color:var(--accent);background:var(--accent-soft)}
+a{color:var(--accent)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--surface);border:1px solid var(--rule);border-radius:10px;color:var(--ink);text-decoration:none}
+.card:hover,.card:focus-visible{border-color:var(--accent)}
+.card .n{font:800 1.4rem/1 var(--display);color:var(--accent)}
+.card span:last-child{color:var(--muted);font-size:.93rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.stat .big{font:800 1.8rem/1 var(--display);font-variant-numeric:tabular-nums}
+.stat .lbl{color:var(--muted);font-size:.92rem}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 .95rem var(--display)}
+.pager a{text-decoration:none}
+:root{--dv-before:#66C093;--dv-after:#207B54}
+@media (prefers-color-scheme: dark){:root{--dv-before:#1A754E;--dv-after:#47A87A}}
+figure{margin:0}
+.diagram{background:#FFFFFF;border:1px solid var(--rule);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.diagram img{display:block;width:100%;height:auto}
+.diagram figcaption{color:#55645F;font:500 .85rem/1.4 var(--display);text-align:center}
+.dv{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.dv-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;font:500 .95rem var(--display);color:var(--ink)}
+.dv-legend{display:flex;gap:14px;color:var(--muted);font-size:.85rem}
+.dv-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.k-before{background:var(--dv-before)}.k-after{background:var(--dv-after)}
+.dv svg{width:100%;height:auto;font-family:var(--display);overflow:visible}
+.dv-grid{stroke:var(--rule);stroke-width:1}
+.dv-axis{fill:var(--muted);font-size:12px}
+.dv-label{fill:var(--ink);font-size:14px;font-weight:500}
+.dv-val{fill:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.dv-strong{fill:var(--ink);font-weight:700}
+.dv-link{stroke:var(--dv-before);stroke-width:2}
+.dv-before{fill:var(--dv-before);stroke:var(--surface);stroke-width:2}
+.dv-after{fill:var(--dv-after);stroke:var(--surface);stroke-width:2}
+.dv-hit{fill:transparent}
+.dv-row:hover .dv-hit,.dv-row:focus .dv-hit{fill:var(--accent-soft)}
+.dv-row:focus{outline:none}
+.dv-foot{margin:0;color:var(--muted);font-size:.85rem}
+@media (max-width:640px){
+  .diagram{overflow-x:auto}
+  .diagram img{min-width:720px}
+  .diagram figcaption{text-align:left}
+  .dv{overflow-x:auto}
+  .dv svg{min-width:560px}
+}
+.stats-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="Modules"><ol><li><a href="index.html">Sommaire</a></li><li><a href="01-migration-dbt.html">1 · Migration dbt</a></li><li><a href="02-gains.html" aria-current="page">2 · Gains</a></li><li><a href="03-historize.html">3 · Historize</a></li><li><a href="04-merge.html">4 · Merge</a></li><li><a href="05-iceberg.html">5 · Iceberg</a></li><li><a href="06-ia.html">6 · IA</a></li><li><a href="07-monorepo-ci-cd.html">7 · CI/CD</a></li><li><a href="08-dbt-v2.html">8 · dbt v2</a></li><li><a href="09-environnements.html">9 · Environnements</a></li></ol></nav>
+<main>
+<header>
+  <span class="eyebrow">Module 2 · Ce que ça a rapporté</span>
+  <h1>Les gains mesurés</h1>
+  <p class="lede">Tous les chiffres ci-dessous ont été mesurés en dev ou en prod entre août et octobre 2026, avant et après chaque changement. Les gains de temps sont réels, mais le gain le plus net de la migration est ailleurs : elle a fait sortir des bugs de prod que personne n'avait vus.</p>
+</header>
+
+<section>
+  <h2>Du code en moins</h2>
+  <div class="stats">
+    <div class="stat"><span class="big">~6 000</span><span class="lbl">lignes de YAML CloudFormation qui ne servaient qu'à déclarer des vues et des tables, retirées</span></div>
+    <div class="stat"><span class="big">237</span><span class="lbl">templates SQL à substitution maison, remplacés par environ 300 modèles dbt</span></div>
+    <div class="stat"><span class="big">2 → 0</span><span class="lbl">graphes de dépendances maintenus à la main dans les pipelines. dbt calcule l'ordre.</span></div>
+  </div>
+  <p>Le retrait le plus utile n'est pas visible dans le compte de lignes : je ne documente plus d'ordre de déploiement. Ajouter un modèle, c'est écrire un fichier avec ses <code>ref()</code>.</p>
+</section>
+
+<section>
+  <h2>Du temps en moins</h2>
+  <figure class="dv">
+    <figcaption class="dv-head"><b>Avant et après, en secondes</b>
+      <span class="dv-legend"><span><i class="k-before"></i>Avant</span><span><i class="k-after"></i>Après</span></span></figcaption>
+    <svg viewBox="0 0 720 348" role="img" aria-label="Temps avant et après pour cinq opérations ; le détail est dans le tableau ci-dessous">
+<line class="dv-grid" x1="8.0" x2="8.0" y1="22" y2="338"/><text class="dv-axis" x="8.0" y="16" text-anchor="middle">0 s</text>
+<line class="dv-grid" x1="222.0" x2="222.0" y1="22" y2="338"/><text class="dv-axis" x="222.0" y="16" text-anchor="middle">30 s</text>
+<line class="dv-grid" x1="436.0" x2="436.0" y1="22" y2="338"/><text class="dv-axis" x="436.0" y="16" text-anchor="middle">60 s</text>
+<line class="dv-grid" x1="650.0" x2="650.0" y1="22" y2="338"/><text class="dv-axis" x="650.0" y="16" text-anchor="middle">90 s</text>
+<g class="dv-row" tabindex="0"><title>Publier une table de cache vers Postgres : 89,3 s avant, 46,0 s après (÷1,9)</title><rect class="dv-hit" x="0" y="28" width="720" height="62"/><text class="dv-label" x="8" y="44">Publier une table de cache vers Postgres</text><line class="dv-link" x1="336.1" x2="645.0" y1="66" y2="66"/><circle class="dv-before" cx="645.0" cy="66" r="7"/><circle class="dv-after" cx="336.1" cy="66" r="7"/><text class="dv-val" x="658.0" y="71">89,3 s</text><text class="dv-val dv-strong" x="323.1" y="71" text-anchor="end">46,0 s</text></g>
+<g class="dv-row" tabindex="0"><title>Historiser une partition de 1,4 Go : 29,5 s avant, 20,5 s après (÷1,4)</title><rect class="dv-hit" x="0" y="90" width="720" height="62"/><text class="dv-label" x="8" y="106">Historiser une partition de 1,4 Go</text><line class="dv-link" x1="154.2" x2="218.4" y1="128" y2="128"/><circle class="dv-before" cx="218.4" cy="128" r="7"/><circle class="dv-after" cx="154.2" cy="128" r="7"/><text class="dv-val" x="231.4" y="133">29,5 s</text><text class="dv-val dv-strong" x="141.2" y="133" text-anchor="end">20,5 s</text></g>
+<g class="dv-row" tabindex="0"><title>Historiser une partition de 14 Mo : 20,7 s avant, 1,6 s après (÷12,9)</title><rect class="dv-hit" x="0" y="152" width="720" height="62"/><text class="dv-label" x="8" y="168">Historiser une partition de 14 Mo</text><line class="dv-link" x1="19.4" x2="155.7" y1="190" y2="190"/><circle class="dv-before" cx="155.7" cy="190" r="7"/><circle class="dv-after" cx="19.4" cy="190" r="7"/><text class="dv-val" x="168.7" y="195">20,7 s</text><text class="dv-val dv-strong" x="168.7" y="195" dx="64">→ 1,6 s</text></g>
+<g class="dv-row" tabindex="0"><title>Publier une petite table gold vers Postgres : 6,9 s avant, 1,9 s après (÷3,6)</title><rect class="dv-hit" x="0" y="214" width="720" height="62"/><text class="dv-label" x="8" y="230">Publier une petite table gold vers Postgres</text><line class="dv-link" x1="21.6" x2="57.2" y1="252" y2="252"/><circle class="dv-before" cx="57.2" cy="252" r="7"/><circle class="dv-after" cx="21.6" cy="252" r="7"/><text class="dv-val" x="70.2" y="257">6,9 s</text><text class="dv-val dv-strong" x="70.2" y="257" dx="55">→ 1,9 s</text></g>
+<g class="dv-row" tabindex="0"><title>Vider une table Postgres, par million de lignes : 2,4 s avant, 0,5 s après (÷4,8)</title><rect class="dv-hit" x="0" y="276" width="720" height="62"/><text class="dv-label" x="8" y="292">Vider une table Postgres, par million de lignes</text><line class="dv-link" x1="11.6" x2="25.1" y1="314" y2="314"/><circle class="dv-before" cx="25.1" cy="314" r="7"/><circle class="dv-after" cx="11.6" cy="314" r="7"/><text class="dv-val" x="38.1" y="319">2,4 s</text><text class="dv-val dv-strong" x="38.1" y="319" dx="55">→ 0,5 s</text></g>
+    </svg>
+    <p class="dv-foot">Survolez une ligne pour le détail. Le tableau ci-dessous donne toutes les mesures, y compris celles qui ne s'expriment pas en secondes.</p>
+  </figure>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Opération</th><th>Avant</th><th>Après</th><th>Levier</th></tr></thead>
+    <tbody>
+      <tr><td>Enregistrer la partition bronze qu'on vient d'écrire</td><td class="num">43 s médiane, 117 s en queue</td><td class="num">1 appel API</td><td><code>CreatePartition</code> ciblé au lieu de <code>MSCK REPAIR</code></td></tr>
+      <tr><td>Historiser une partition de 14 Mo</td><td class="num">20,7 s</td><td class="num">1,6 s</td><td>DuckDB dans Lambda</td></tr>
+      <tr><td>Historiser une partition de 1,4 Go</td><td class="num">29,5 s</td><td class="num">20,5 s</td><td>DuckDB dans Lambda</td></tr>
+      <tr><td>Publier une petite table gold Iceberg vers Postgres</td><td class="num">6,9 s</td><td class="num">1,9 s</td><td>DuckDB lit Iceberg via le catalogue Glue, sans <code>UNLOAD</code></td></tr>
+      <tr><td>Publier une table de cache vers Postgres</td><td class="num">89,3 s</td><td class="num">46,0 s</td><td>Idem</td></tr>
+      <tr><td>Vider une table Postgres attachée à DuckDB</td><td class="num">2,4 s par million de lignes</td><td class="num">0,5 s</td><td><code>postgres_execute</code> au lieu du <code>DELETE</code> de DuckDB</td></tr>
+      <tr><td>Appel dbt depuis un pipeline</td><td class="num">+ ~20 s de démarrage</td><td class="num">0</td><td>Worker ECS maintenu chaud, appelé par SQS et task token</td></tr>
+      <tr><td>Merge incrémental d'un modèle</td><td colspan="2" class="num">7 à 45 s par modèle</td><td>Mesuré en routine, après bascule</td></tr>
+      <tr><td>Déploiement complet de l'infra</td><td class="num">21,5 min, une stack à la fois</td><td class="num">29 stacks en 6 vagues</td><td>Vagues calculées à partir du graphe de dépendances</td></tr>
+      <tr><td>Analyse à la demande (6 modèles partagés)</td><td class="num">8 builds</td><td class="num">6</td><td>Modèles partagés construits une fois, avant les sections</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p><b>Les threads dbt.</b> J'étais resté à 4, la valeur par défaut. Un build composé surtout de <code>CREATE VIEW</code> (DDL) et de <code>MERGE</code> (DML) laissait presque intacts les quotas Athena du compte (150 requêtes DML et 100 DDL en parallèle). Passé à 24 en prod. Vérifiez vos quotas Athena avant de monter, c'est le seul plafond.</p>
+</section>
+
+<section>
+  <h2>Des bugs de prod, trouvés en route</h2>
+  <p>La règle « la parité est le critère » oblige à expliquer chaque écart. Quatre de ces écarts étaient des bugs présents en prod depuis des mois :</p>
+  <div class="traps">
+    <div class="trap"><b>Un GROUP BY qui démultipliait les lignes</b><span>Une vue groupait par une colonne de montant non agrégée au lieu de la sommer. Chaque jour avec plusieurs ventes d'un même produit produisait une ligne par montant distinct : 46 130 lignes en trop, de façon reproductible. Le portage dbt était juste, la prod était fausse. Le test est passé en <code>warn</code>, pour ne pas forcer la parité en réintroduisant le bug.</span></div>
+    <div class="trap"><b>Une clé de merge trop courte</b><span>Une organisation qui vend sur trois marketplaces : la clé ne contenait pas le fournisseur, donc seule la dernière marketplace mergée survivait. Avec la clé corrigée, chaque marketplace garde toutes ses lignes. Mesuré sur un seul jour et une seule organisation : 777 unités de stock récupérées.</span></div>
+    <div class="trap"><b>Une clé avec une colonne NULL</b><span>Une colonne de la clé primaire était NULL sur toutes les lignes d'une source. En SQL, <code>NULL = NULL</code> n'est jamais vrai : le <code>MERGE</code> ne matchait jamais et réinsérait les mêmes lignes à chaque run. Résultat : 1 814 lignes pour 25 clés distinctes.</span></div>
+    <div class="trap"><b>Des <code>NOT IN</code> qui ne tenaient qu'à un fil</b><span>Cinq vues filtraient avec <code>NOT IN (SELECT …)</code>. Un seul NULL dans la sous-requête et elles ne renvoient plus rien, en silence. Converties en anti-joins (<code>LEFT JOIN … IS NULL</code>), parité verte, preuve que rien n'a changé.</span></div>
+  </div>
+</section>
+
+<section>
+  <h2>Ce que les chiffres ne disent pas</h2>
+  <ul>
+    <li><b>Le coût de la migration.</b> Plusieurs semaines de travail, domaine par domaine. Une grande partie a été faite avec Claude Code : génération des modèles à partir des vues déployées, scripts de parité, lecture des templates déployés. Ce volume de vérifications n'aurait pas été tenable à la main pour une seule personne.</li>
+    <li><b>Un nouveau runtime à exploiter</b> : image ECS, worker, permis d'écriture, alertes sur les échecs dbt. dbt n'est pas gratuit en exploitation.</li>
+    <li><b>Les limites de dbt-athena</b> restent : pas de transactions, conflits de commit Iceberg en écriture concurrente, renommages de colonnes à faire à la main (<code>on_schema_change</code> ne gère que les ajouts), maintenance Iceberg hors de dbt.</li>
+    <li><b>Le gain de lisibilité</b>, enfin, ne se mesure pas mais se voit : le lignage dbt (<code>manifest.json</code>) est maintenant consommé par le pipeline lui-même pour décider si une colonne de landing peut être retirée (module 6).</li>
+  </ul>
+</section>
+
+<nav class="pager" aria-label="Module précédent et suivant"><a href="01-migration-dbt.html">← 1 · Migration dbt</a><a href="03-historize.html">3 · Historize →</a></nav>
+<footer>
+  <span>David Banquet · Wavo · data platform AWS serverless : Python 3.12, dbt-core 1.12 et dbt-athena 1.11, DuckDB, Iceberg sur Athena, Claude sur Bedrock et Claude Code.</span>
+  <span>Chiffres mesurés en dev ou en prod entre août et octobre 2026. Aucune donnée client ni identifiant d'infrastructure ici. Retours bienvenus, surtout sur la partie Lake Formation.</span>
+</footer>
+</main>
+</body>
+</html>

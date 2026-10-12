@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Merge dans Iceberg</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F5; --surface:#FFFFFF; --ink:#13201D; --muted:#55645F; --rule:#D3DCD8;
+  --accent:#0B6E5F; --accent-soft:#DDEFEA; --warn:#A4471B; --warn-soft:#F6E5DB;
+  --bronze:#9A6A2F; --silver:#6F7C86; --gold:#B08A12;
+  --code-bg:#E8EDEB;
+  --display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --ground:#0E1513; --surface:#151F1C; --ink:#E3ECE9; --muted:#97A8A2; --rule:#26332F;
+    --accent:#5CC9B4; --accent-soft:#16312B; --warn:#F09A6E; --warn-soft:#352015;
+    --bronze:#D3A266; --silver:#AAB6BF; --gold:#E2BE4A;
+    --code-bg:#1B2724;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 17px/1.65 var(--body);padding-inline:20px;padding-block:44px 88px}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:60px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(2.1rem,5.4vw,3.1rem);font-weight:800;letter-spacing:-.025em}
+h2{font-size:1.65rem;font-weight:700;letter-spacing:-.012em}
+h3{font-size:1.08rem;font-weight:700}
+p{margin:0}
+section{display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font:500 .74rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.18rem;color:var(--muted);max-width:62ch}
+code{font:400 .84em var(--mono);background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+pre{margin:0;background:var(--code-bg);border-radius:8px;padding:14px 16px;overflow-x:auto;font:400 .82rem/1.55 var(--mono)}
+pre code{background:none;padding:0;font-size:inherit}
+ul,ol{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:8px}
+b{font-weight:600}
+.layers{display:flex;gap:6px;flex-wrap:wrap;font:500 .78rem/1 var(--mono)}
+.layers span{padding:6px 10px;border-radius:4px;border:1px solid var(--rule);background:var(--surface)}
+.layers .b{color:var(--bronze)} .layers .s{color:var(--silver)} .layers .g{color:var(--gold)}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;font-family:var(--body)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font:500 .72rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-size:.86rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+.trap{border-left:3px solid var(--warn);background:var(--warn-soft);padding:12px 16px;border-radius:0 8px 8px 0;display:flex;flex-direction:column;gap:6px}
+.trap b{color:var(--warn)}
+.traps{display:flex;flex-direction:column;gap:12px}
+.kicker{font:700 .8rem/1 var(--display);letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+footer{color:var(--muted);font-size:.92rem;border-top:1px solid var(--rule);padding-top:20px;display:flex;flex-direction:column;gap:8px}
+
+.topnav{position:sticky;top:0;z-index:5;background:var(--ground);border-bottom:1px solid var(--rule);margin-inline:-20px;padding:10px 20px;overflow-x:auto}
+.topnav ol{list-style:none;margin:0 auto;padding:0;display:flex;gap:4px;flex-direction:row;max-width:760px;white-space:nowrap;font:500 .8rem/1 var(--display)}
+.topnav a{display:block;padding:7px 10px;border-radius:6px;color:var(--muted);text-decoration:none}
+.topnav a:hover,.topnav a:focus-visible{color:var(--ink);background:var(--surface)}
+.topnav a[aria-current]{color:var(--accent);background:var(--accent-soft)}
+a{color:var(--accent)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--surface);border:1px solid var(--rule);border-radius:10px;color:var(--ink);text-decoration:none}
+.card:hover,.card:focus-visible{border-color:var(--accent)}
+.card .n{font:800 1.4rem/1 var(--display);color:var(--accent)}
+.card span:last-child{color:var(--muted);font-size:.93rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.stat .big{font:800 1.8rem/1 var(--display);font-variant-numeric:tabular-nums}
+.stat .lbl{color:var(--muted);font-size:.92rem}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 .95rem var(--display)}
+.pager a{text-decoration:none}
+:root{--dv-before:#66C093;--dv-after:#207B54}
+@media (prefers-color-scheme: dark){:root{--dv-before:#1A754E;--dv-after:#47A87A}}
+figure{margin:0}
+.diagram{background:#FFFFFF;border:1px solid var(--rule);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.diagram img{display:block;width:100%;height:auto}
+.diagram figcaption{color:#55645F;font:500 .85rem/1.4 var(--display);text-align:center}
+.dv{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.dv-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;font:500 .95rem var(--display);color:var(--ink)}
+.dv-legend{display:flex;gap:14px;color:var(--muted);font-size:.85rem}
+.dv-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.k-before{background:var(--dv-before)}.k-after{background:var(--dv-after)}
+.dv svg{width:100%;height:auto;font-family:var(--display);overflow:visible}
+.dv-grid{stroke:var(--rule);stroke-width:1}
+.dv-axis{fill:var(--muted);font-size:12px}
+.dv-label{fill:var(--ink);font-size:14px;font-weight:500}
+.dv-val{fill:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.dv-strong{fill:var(--ink);font-weight:700}
+.dv-link{stroke:var(--dv-before);stroke-width:2}
+.dv-before{fill:var(--dv-before);stroke:var(--surface);stroke-width:2}
+.dv-after{fill:var(--dv-after);stroke:var(--surface);stroke-width:2}
+.dv-hit{fill:transparent}
+.dv-row:hover .dv-hit,.dv-row:focus .dv-hit{fill:var(--accent-soft)}
+.dv-row:focus{outline:none}
+.dv-foot{margin:0;color:var(--muted);font-size:.85rem}
+@media (max-width:640px){
+  .diagram{overflow-x:auto}
+  .diagram img{min-width:720px}
+  .diagram figcaption{text-align:left}
+  .dv{overflow-x:auto}
+  .dv svg{min-width:560px}
+}
+.stats-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="Modules"><ol><li><a href="index.html">Sommaire</a></li><li><a href="01-migration-dbt.html">1 · Migration dbt</a></li><li><a href="02-gains.html">2 · Gains</a></li><li><a href="03-historize.html">3 · Historize</a></li><li><a href="04-merge.html" aria-current="page">4 · Merge</a></li><li><a href="05-iceberg.html">5 · Iceberg</a></li><li><a href="06-ia.html">6 · IA</a></li><li><a href="07-monorepo-ci-cd.html">7 · CI/CD</a></li><li><a href="08-dbt-v2.html">8 · dbt v2</a></li><li><a href="09-environnements.html">9 · Environnements</a></li></ol></nav>
+<main>
+<header>
+  <span class="eyebrow">Module 4 · Leviers d'optimisation</span>
+  <h1>Merge dans Iceberg</h1>
+  <p class="lede">Le passage bronze → silver : plusieurs sources (un ERP par client, des exports mail, des API) fusionnent dans une même table Iceberg par <code>MERGE</code>. C'est là que se logent les bugs les plus coûteux, parce qu'un merge raté ne lève aucune erreur : il insère des doublons ou écrase en silence.</p>
+</header>
+
+<section>
+  <h2>Deux formes de cibles</h2>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th></th><th>Cible de merge</th><th>Cible de refresh</th></tr></thead>
+    <tbody>
+      <tr><td>Nature</td><td>Accumule l'historique, ligne par ligne</td><td>Fonction déterministe de ses sources</td></tr>
+      <tr><td>Matérialisation dbt</td><td><code>incremental</code>, stratégie <code>merge</code>, <code>unique_key</code></td><td><code>incremental</code>, stratégie <code>append</code>, avec un <code>DELETE</code> du périmètre en pre-hook</td></tr>
+      <tr><td>Reconstruction complète</td><td>Jamais : on perdrait l'historique</td><td>Possible, sur tout ou partie du périmètre</td></tr>
+      <tr><td>Exemple</td><td>Stocks, ventes, flux d'inventaire par fournisseur</td><td>Agrégats et indicateurs gold</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section>
+  <h2>La config d'une cible de merge</h2>
+  <p>Onze modèles ne diffèrent que par leur famille et leur config. Le corps est donc partagé dans une macro, et chaque modèle ne déclare que ce qui lui est propre :</p>
+<pre><code>config(
+    materialized='incremental',
+    incremental_strategy='merge',
+    unique_key=unique_key,
+    merge_exclude_columns=['created_at'],        # jamais réécrit après l'insert
+    merge_update_columns_rules=rules,            # coalesce par colonne optionnelle
+    on_schema_change='append_new_columns',       # jamais sync_all_columns sur Iceberg
+    unique_tmp_table_suffix=true,                # staging unique : runs concurrents possibles
+    table_type='iceberg',
+    table_properties={
+        'optimize_rewrite_delete_file_threshold': '2',
+        'optimize_rewrite_data_file_threshold': '2',
+        'write_target_data_file_size_bytes': '536870912',
+    },
+    incremental_predicates=(
+        ["target.organization_id = '" ~ var('organization_id') ~ "'"]
+        if var('organization_id', none) else none
+    ),
+)</code></pre>
+  <h3>Pourquoi <code>coalesce</code> sur les colonnes optionnelles</h3>
+  <p>L'ancienne Lambda construisait son <code>UPDATE SET</code> à partir de l'intersection colonnes source ∩ cible, <b>source par source</b> : une colonne qu'un fournisseur ne fournit pas restait intacte dans la cible. Une union dbt doit émettre toutes les colonnes pour tous les membres, et le <code>UPDATE SET</code> de dbt écrirait alors le NULL d'alignement par-dessus une valeur existante. La règle <code>coalesce</code> rétablit le comportement : la source gagne quand elle a une valeur, la cible survit sinon. La seule chose qu'elle ne reproduit pas, c'est un membre qui voudrait volontairement remettre une valeur à NULL. Sur des snapshots d'ERP, ça n'arrive jamais.</p>
+</section>
+
+<section>
+  <h2>Levier 1 : le fan-out par organisation</h2>
+  <p>Un pipeline par client merge seulement les lignes de ce client. Il y a deux moitiés, et elles vont ensemble :</p>
+  <ul>
+    <li>un <code>WHERE organization_id = …</code> dans le modèle, qui restreint la <b>table de staging</b> ;</li>
+    <li>un <code>incremental_predicates</code> sur la <b>cible</b>, qui restreint le <code>ON</code> du <code>MERGE</code>.</li>
+  </ul>
+  <div class="trap"><b>Une moitié sans l'autre produit des doublons</b><span>Sans le prédicat sur la cible, le <code>ON</code> ne porte que sur la clé et compare à toute la table ; Iceberg doit alors lire toute la table. Et avec le prédicat appliqué à un run multi-organisations (fan-in), la staging contient tous les clients mais la cible n'en expose qu'un : tous les autres sont réinsérés. Les deux moitiés dépendent de la même variable, et doivent le rester.</span></div>
+  <p>Le partitionnement des cibles par <code>organization_id</code> rend ce prédicat rentable : le <code>MERGE</code> ne réécrit que les fichiers d'une partition.</p>
+</section>
+
+<section>
+  <h2>Levier 2 : borner la concurrence par table écrite</h2>
+  <p>Iceberg gère la concurrence de façon optimiste : deux <code>MERGE</code> simultanés sur la même table, l'un des deux échoue au commit (<code>ICEBERG_COMMIT_ERROR</code>). Les données ne sont pas corrompues, mais il faut réessayer, et sous forte contention les retries s'enchaînent.</p>
+  <ul>
+    <li><b>Un compteur de permis par table écrite</b>, dans DynamoDB avec écritures conditionnelles, pris avant le <code>MERGE</code> et rendu après. « ventes ≤ 3 » et « stocks ≤ 3 » sont deux compteurs distincts : six merges tournent en parallèle sans qu'aucune table n'en voie plus de trois.</li>
+    <li><b>Un compteur partagé, pas un sémaphore en mémoire</b> : ce dernier ne borne plus rien dès que le service tourne sur plus d'une tâche ECS.</li>
+    <li><b>C'est un contrôle de contention, pas de correction.</b> La correction vient des tables de staging uniques et des retries Iceberg. Si on traite le compteur comme un invariant, on finit par le mettre à 1 « par sécurité » et on sérialise un pipeline qui n'en avait pas besoin.</li>
+    <li><b>Trois réglages indépendants</b> : <code>MaxConcurrency</code> des Step Functions (combien de pipelines), le nombre de process dbt par tâche, et <code>--threads</code> (parallélisme dans un DAG). Montez d'abord le nombre de tâches ECS, en vous guidant sur le temps passé en file : dbt attend surtout Athena, et plusieurs petits workers limitent l'impact d'un crash.</li>
+    <li><b>Un verrou par analyse</b> quand plusieurs étapes doivent voir des tables stables : le verrou couvre toute l'exécution, ce que des permis par étape ne savent pas exprimer.</li>
+  </ul>
+  <p>En pratique, espacez aussi les relances manuelles : trois redrives lancés coup sur coup donnent trois publications concurrentes qui se rejettent.</p>
+</section>
+
+<section>
+  <h2>Levier 3 : ne réécrire que ce qui a changé</h2>
+  <p>Un hash par ligne, calculé dans la vue source, sert de condition de mise à jour : une ligne matchée dont le hash n'a pas bougé n'est pas réécrite, donc aucun fichier de suppression ni nouveau fichier de données n'est produit.</p>
+<pre><code>{% macro record_hash(fields) -%}
+    MD5(TO_UTF8(
+        {%- for field in fields %}
+        COALESCE(CAST("{{ field }}" AS VARCHAR), ''){% if not loop.last %} || '|' ||{% endif %}
+        {%- endfor %}
+    )) AS record_hash
+{%- endmacro %}</code></pre>
+  <ul>
+    <li><b>L'ordre des champs fait partie du contrat.</b> Le modifier change tous les hash, et le merge suivant réécrit toutes les lignes qu'il matche. La liste est donc passée explicitement, modèle par modèle.</li>
+    <li><b>Mettez le hash dans la vue de base, pas dans une vue au-dessus.</b> J'avais 23 vues <code>SELECT *, MD5(…)</code> : Athena stocke l'expansion du <code>*</code>, et dès que l'ordre des colonnes de la vue de base a changé, elles sont devenues illisibles (<code>VIEW_IS_STALE</code>), sans que rien ne le signale.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Levier 4 : des familles de sources sans liste à maintenir</h2>
+  <p>Plusieurs sources (un fournisseur ERP chacune) alimentent une même cible. L'appartenance à une famille est un <b>tag dbt</b>, et l'union est générée à partir du tag. Une assertion fait échouer le build si le tag et la liste déclarée divergent. Ajouter un fournisseur revient à écrire un modèle et à le taguer.</p>
+  <p>Deux exceptions où l'union est fausse :</p>
+  <ul>
+    <li><b>Quand l'ordre fait la précédence.</b> Mes étapes de catégorisation (mots-clés, LLM, manuel) sont mergées l'une après l'autre : la correction manuelle gagne parce qu'elle passe en dernier. Une union ferait perdre cet ordre.</li>
+    <li><b>Quand deux membres produisent volontairement la même clé</b> (une ligne rattrapée depuis une source et recalculée depuis une autre) : une union donnerait deux lignes au <code>MERGE</code> pour une seule clé.</li>
+  </ul>
+  <p>Dans ces deux cas, je garde un membre par run.</p>
+</section>
+
+<section>
+  <h2>Les clés : là où naissent les doublons</h2>
+  <div class="traps">
+    <div class="trap"><b>Une colonne NULL dans la clé</b><span>En SQL, <code>NULL = NULL</code> n'est jamais vrai : le <code>MERGE</code> ne matche jamais et réinsère à chaque run. J'avais 1 814 lignes pour 25 clés distinctes. Les trois remèdes (une valeur sentinelle, retirer la colonne de la clé, supprimer les doublons) modifient tous des données stockées : c'est une décision métier, pas un correctif technique.</span></div>
+    <div class="trap"><b>Une clé trop courte</b><span>Sans le fournisseur dans la clé, une organisation présente sur trois marketplaces ne gardait que la dernière mergée.</span></div>
+    <div class="trap"><b>Un <code>SELECT DISTINCT</code> de précaution</b><span>L'ancienne Lambda dédoublonnait la source avant le merge. Mesuré : toutes les sources étaient déjà uniques sur leur clé. Ce <code>DISTINCT</code> ne protégeait de rien et coûtait un tri.</span></div>
+  </div>
+  <p class="note">Une requête à lancer chez vous : pour chaque table cible, <code>COUNT(*)</code> comparé à <code>COUNT(DISTINCT clé)</code>, et le nombre de lignes dont une colonne de la clé est NULL. Après la bascule, c'est le critère que j'ai retenu : des insertions seulement, aucune clé dupliquée, aucune colonne de clé NULL.</p>
+</section>
+
+<section>
+  <h2>Les cibles de refresh</h2>
+<pre><code>config(
+    materialized='incremental',
+    incremental_strategy='append',
+    pre_hook='{{ delete_refresh_scope() }}',   -- DELETE du périmètre, ou de toute la table
+    post_hook=['VACUUM {{ this }}',
+               'OPTIMIZE {{ this }} REWRITE DATA USING BIN_PACK'],
+    table_type='iceberg',
+)</code></pre>
+  <ul>
+    <li><b>Le même modèle couvre le rafraîchissement complet et le partiel</b> : il suffit de passer ou non un filtre (<code>--vars</code>), comme le faisait l'ancienne Lambda avec son payload.</li>
+    <li><b><code>VACUUM</code> puis <code>OPTIMIZE</code> en post-hook</b>, parce que chaque run ajoute un snapshot et que rien d'autre ne les élague. Désactivés dans les namespaces de CI, où la table vient d'être créée vide : environ 3 s gagnées par modèle.</li>
+    <li><b>Une garde sur les modèles coûteux</b> : certains ne doivent jamais être reconstruits entièrement. Sans filtre, ils liraient toutes les organisations <i>et</i> videraient la table d'abord. Le modèle refuse alors de tourner. La Lambda n'en avait pas besoin, personne n'envoyait de payload sans filtre ; avec dbt, le run est une ligne de commande, et la garde tient en quatre lignes.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Les backfills</h2>
+  <ul>
+    <li>Athena plafonne une requête DML à 30 minutes. Une table de 82 millions de lignes se backfille <b>une organisation à la fois</b>.</li>
+    <li>Un script de migration doit être idempotent face aux colonnes que Glue garde après une suppression Iceberg (non courantes) : sinon, une relance voit la colonne supprimée et refait toute la migration.</li>
+  </ul>
+</section>
+
+<nav class="pager" aria-label="Module précédent et suivant"><a href="03-historize.html">← 3 · Historize</a><a href="05-iceberg.html">5 · Iceberg →</a></nav>
+<footer>
+  <span>David Banquet · Wavo · data platform AWS serverless : Python 3.12, dbt-core 1.12 et dbt-athena 1.11, DuckDB, Iceberg sur Athena, Claude sur Bedrock et Claude Code.</span>
+  <span>Chiffres mesurés en dev ou en prod entre août et octobre 2026. Aucune donnée client ni identifiant d'infrastructure ici. Retours bienvenus, surtout sur la partie Lake Formation.</span>
+</footer>
+</main>
+</body>
+</html>

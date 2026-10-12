@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>dbt v2 et Athena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F5; --surface:#FFFFFF; --ink:#13201D; --muted:#55645F; --rule:#D3DCD8;
+  --accent:#0B6E5F; --accent-soft:#DDEFEA; --warn:#A4471B; --warn-soft:#F6E5DB;
+  --bronze:#9A6A2F; --silver:#6F7C86; --gold:#B08A12;
+  --code-bg:#E8EDEB;
+  --display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --ground:#0E1513; --surface:#151F1C; --ink:#E3ECE9; --muted:#97A8A2; --rule:#26332F;
+    --accent:#5CC9B4; --accent-soft:#16312B; --warn:#F09A6E; --warn-soft:#352015;
+    --bronze:#D3A266; --silver:#AAB6BF; --gold:#E2BE4A;
+    --code-bg:#1B2724;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 17px/1.65 var(--body);padding-inline:20px;padding-block:44px 88px}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:60px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(2.1rem,5.4vw,3.1rem);font-weight:800;letter-spacing:-.025em}
+h2{font-size:1.65rem;font-weight:700;letter-spacing:-.012em}
+h3{font-size:1.08rem;font-weight:700}
+p{margin:0}
+section{display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font:500 .74rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.18rem;color:var(--muted);max-width:62ch}
+code{font:400 .84em var(--mono);background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+pre{margin:0;background:var(--code-bg);border-radius:8px;padding:14px 16px;overflow-x:auto;font:400 .82rem/1.55 var(--mono)}
+pre code{background:none;padding:0;font-size:inherit}
+ul,ol{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:8px}
+b{font-weight:600}
+.layers{display:flex;gap:6px;flex-wrap:wrap;font:500 .78rem/1 var(--mono)}
+.layers span{padding:6px 10px;border-radius:4px;border:1px solid var(--rule);background:var(--surface)}
+.layers .b{color:var(--bronze)} .layers .s{color:var(--silver)} .layers .g{color:var(--gold)}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;font-family:var(--body)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font:500 .72rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-size:.86rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+.trap{border-left:3px solid var(--warn);background:var(--warn-soft);padding:12px 16px;border-radius:0 8px 8px 0;display:flex;flex-direction:column;gap:6px}
+.trap b{color:var(--warn)}
+.traps{display:flex;flex-direction:column;gap:12px}
+.kicker{font:700 .8rem/1 var(--display);letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+footer{color:var(--muted);font-size:.92rem;border-top:1px solid var(--rule);padding-top:20px;display:flex;flex-direction:column;gap:8px}
+
+.topnav{position:sticky;top:0;z-index:5;background:var(--ground);border-bottom:1px solid var(--rule);margin-inline:-20px;padding:10px 20px;overflow-x:auto}
+.topnav ol{list-style:none;margin:0 auto;padding:0;display:flex;gap:4px;flex-direction:row;max-width:760px;white-space:nowrap;font:500 .8rem/1 var(--display)}
+.topnav a{display:block;padding:7px 10px;border-radius:6px;color:var(--muted);text-decoration:none}
+.topnav a:hover,.topnav a:focus-visible{color:var(--ink);background:var(--surface)}
+.topnav a[aria-current]{color:var(--accent);background:var(--accent-soft)}
+a{color:var(--accent)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--surface);border:1px solid var(--rule);border-radius:10px;color:var(--ink);text-decoration:none}
+.card:hover,.card:focus-visible{border-color:var(--accent)}
+.card .n{font:800 1.4rem/1 var(--display);color:var(--accent)}
+.card span:last-child{color:var(--muted);font-size:.93rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.stat .big{font:800 1.8rem/1 var(--display);font-variant-numeric:tabular-nums}
+.stat .lbl{color:var(--muted);font-size:.92rem}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 .95rem var(--display)}
+.pager a{text-decoration:none}
+:root{--dv-before:#66C093;--dv-after:#207B54}
+@media (prefers-color-scheme: dark){:root{--dv-before:#1A754E;--dv-after:#47A87A}}
+figure{margin:0}
+.diagram{background:#FFFFFF;border:1px solid var(--rule);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.diagram img{display:block;width:100%;height:auto}
+.diagram figcaption{color:#55645F;font:500 .85rem/1.4 var(--display);text-align:center}
+.dv{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.dv-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;font:500 .95rem var(--display);color:var(--ink)}
+.dv-legend{display:flex;gap:14px;color:var(--muted);font-size:.85rem}
+.dv-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.k-before{background:var(--dv-before)}.k-after{background:var(--dv-after)}
+.dv svg{width:100%;height:auto;font-family:var(--display);overflow:visible}
+.dv-grid{stroke:var(--rule);stroke-width:1}
+.dv-axis{fill:var(--muted);font-size:12px}
+.dv-label{fill:var(--ink);font-size:14px;font-weight:500}
+.dv-val{fill:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.dv-strong{fill:var(--ink);font-weight:700}
+.dv-link{stroke:var(--dv-before);stroke-width:2}
+.dv-before{fill:var(--dv-before);stroke:var(--surface);stroke-width:2}
+.dv-after{fill:var(--dv-after);stroke:var(--surface);stroke-width:2}
+.dv-hit{fill:transparent}
+.dv-row:hover .dv-hit,.dv-row:focus .dv-hit{fill:var(--accent-soft)}
+.dv-row:focus{outline:none}
+.dv-foot{margin:0;color:var(--muted);font-size:.85rem}
+@media (max-width:640px){
+  .diagram{overflow-x:auto}
+  .diagram img{min-width:720px}
+  .diagram figcaption{text-align:left}
+  .dv{overflow-x:auto}
+  .dv svg{min-width:560px}
+}
+.stats-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="Modules"><ol><li><a href="index.html">Sommaire</a></li><li><a href="01-migration-dbt.html">1 · Migration dbt</a></li><li><a href="02-gains.html">2 · Gains</a></li><li><a href="03-historize.html">3 · Historize</a></li><li><a href="04-merge.html">4 · Merge</a></li><li><a href="05-iceberg.html">5 · Iceberg</a></li><li><a href="06-ia.html">6 · IA</a></li><li><a href="07-monorepo-ci-cd.html">7 · CI/CD</a></li><li><a href="08-dbt-v2.html" aria-current="page">8 · dbt v2</a></li><li><a href="09-environnements.html">9 · Environnements</a></li></ol></nav>
+<main>
+<header>
+  <span class="eyebrow">Module 8 · Ce qui arrive</span>
+  <h1>dbt v2 et le connecteur Athena</h1>
+  <p class="lede">dbt Core 2.0 est sorti le 14 septembre 2026 : une réécriture complète en Rust, sous licence Apache 2.0. Athena n'en fait pas encore partie. Le connecteur est en cours d'écriture par la communauté, et j'y contribue. Ce module fait le point en octobre 2026 : ce que v2 apporte, où en est Athena, et comment s'y préparer.</p>
+</header>
+
+<section>
+  <h2>Ce qu'est dbt v2</h2>
+  <p>C'est le moteur qui s'appelait « dbt Fusion », devenu la branche principale de <code>dbt-labs/dbt</code> et relicencié en Apache 2.0. La v1 en Python continue sur la branche <code>1.latest</code> : elle ne disparaît pas du jour au lendemain. Chronologie : alpha le 1er juin 2026, 2.0.0 le 14 septembre, 2.0.5 quatre jours plus tard.</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Apport</th><th>Ce que ça change chez Wavo</th></tr></thead>
+    <tbody>
+      <tr><td><b>Parse et compile beaucoup plus rapides</b></td><td>Le cycle édition → compilation devient quasi instantané, et la CI paie moins chaque parse.</td></tr>
+      <tr><td><b>Plus strict</b> : une spécification du langage vérifiée dès le parse</td><td>Des erreurs qui n'apparaissaient qu'à l'exécution sur Athena sortent avant. En contrepartie, un projet v1 tolérant peut refuser de parser.</td></tr>
+      <tr><td><b>Un binaire autonome, sans runtime Python</b></td><td>Chez Wavo, dbt est isolé derrière un wrapper <code>uvx</code> pour que ses quarante dépendances n'atteignent jamais mes Lambdas. Avec v2, ce problème n'existe plus, et l'image du worker ECS s'allège.</td></tr>
+      <tr><td><b>Artefacts en Parquet</b></td><td>Le <code>manifest.json</code> reste produit : mon pipeline, qui lit le lignage, n'est pas cassé.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <div class="trap"><b>Ce qui n'est pas dans le moteur ouvert</b><span>La compréhension avancée du SQL, le linting et le lignage par colonne restent des fonctionnalités « Fusion » sous licence produit, activées par <code>dbt login</code>. Le code Apache 2.0 n'en contient que les clients. Et sur Athena, l'analyse statique est de toute façon désactivée pour l'instant : <code>dbt debug</code> l'indique.</span></div>
+  <p>Pour tester la compatibilité de votre projet sans rien migrer : dbt-core 1.12 propose <code>dbt parse --use-v2-parser</code>. C'est la première chose à lancer.</p>
+</section>
+
+<section>
+  <h2>Le connecteur Athena, où on en est</h2>
+  <p class="note">Rien n'est encore mergé. Le code avance, mais tout attend la revue de dbt Labs. Aucune date de sortie n'est annoncée publiquement.</p>
+  <p>Le suivi se fait sur l'issue <a href="https://github.com/dbt-labs/dbt/issues/16252">dbt-labs/dbt#16252</a>. Le travail est découpé en une série de PR, écrites par deux contributeurs externes à dbt Labs, avec quelques correctifs de ma part :</p>
+  <div class="table-wrap">
+  <table>
+    <thead><tr><th>Partie</th><th>PR</th><th>Contenu</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td class="num">#16365</td><td>Branchement du driver</td></tr>
+      <tr><td>1</td><td class="num">#16274</td><td>Schéma du profil Athena</td></tr>
+      <tr><td>2</td><td class="num">#16367</td><td>Parse</td></tr>
+      <tr><td>3</td><td class="num">#16368</td><td>Configs de modèles</td></tr>
+      <tr><td>4</td><td class="num">#16369</td><td>Macros de dbt-athena 1.11</td></tr>
+      <tr><td>5</td><td class="num">#16374</td><td>Adaptateur de métadonnées (Glue)</td></tr>
+      <tr><td>6 et 7</td><td class="num">#16376</td><td>Exécution et méthodes de l'adaptateur</td></tr>
+      <tr><td>7</td><td class="num">#16452</td><td>Quoting Hive</td></tr>
+      <tr><td>8</td><td class="num">#16370</td><td>Tests unitaires</td></tr>
+      <tr><td>9</td><td class="num">#16375</td><td><code>dbt init</code></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p>Le driver Go, dans <code>dbt-labs/athena</code>, a lui aussi trois PR ouvertes : #15 (timestamps), #19 (Glue, S3, STS) et #20 (statistiques de requêtes).</p>
+  <h3>Ce qui fonctionne déjà, sur la branche d'exécution</h3>
+  <ul>
+    <li>Tables Iceberg : <code>merge</code>, <code>append</code>, <code>microbatch</code>, partitionnement par <code>day()</code>.</li>
+    <li>Tables Hive : <code>insert_overwrite</code> avec réécriture partielle de partitions, et le mode <code>ha</code>.</li>
+    <li>Snapshots, seeds, <code>persist_docs</code>.</li>
+    <li><b>Tags Lake Formation et data cell filters</b>, workgroup imposé, assume role. C'est le point qui vous concerne le plus.</li>
+    <li>Le catalogue Glue déclaré dans <code>catalogs.yml</code>.</li>
+  </ul>
+  <h3>Ce qui coince encore</h3>
+  <ul>
+    <li><code>insert_overwrite</code> sur une partition de type <code>timestamp</code> : le driver se trompe d'unité. Le correctif est dans athena#15, pas encore mergé.</li>
+    <li>Les partitions <code>bucket()</code> ne sont pas supportées.</li>
+    <li>S3 Tables n'a pas été testé.</li>
+    <li>Pour rappel, même en 1.11, <code>insert_overwrite</code> est réservé à Hive. Iceberg n'accepte que <code>append</code>, <code>merge</code> et <code>microbatch</code>.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Premières mesures</h2>
+  <p>Sur un petit projet de test (11 modèles, eu-west-1), comparé à dbt-core 1.11 avec dbt-athena 1.11. Chiffres publiés sur #16252 :</p>
+  <div class="stats">
+    <div class="stat"><span class="big">1,8 s → 0,6 s</span><span class="lbl">parse du projet</span></div>
+    <div class="stat"><span class="big">42 → 0</span><span class="lbl">requêtes <code>information_schema</code> pendant un run : les métadonnées passent par l'API Glue</span></div>
+    <div class="stat"><span class="big">24 / 24</span><span class="lbl">tests verts, avec le correctif des seeds (#16460)</span></div>
+  </div>
+  <p>Le temps total d'un run ne bouge presque pas à 11 modèles : sur Athena, c'est l'exécution des requêtes qui domine, pas dbt. Le gain se verra sur les gros projets, au parse et à la compilation, donc surtout en CI et en développement.</p>
+</section>
+
+<section>
+  <h2>Mes contributions</h2>
+  <p>Je ne réécris pas le connecteur. J'éprouve les branches sur des cas réels et je corrige ce qui casse :</p>
+  <ul>
+    <li><b>dbt v2</b> : la casse des <code>column_types</code> dans les seeds (#16460, qui corrige #16459) ; les types dans les contrats de modèles (#16571) ; la vérification des schémas requis, qui listait toutes les bases du catalogue (#16698, ouverte le 12 octobre).</li>
+    <li><b>Directement dans les branches de la série</b> : le quoting du data catalog, et les types complexes dans le DDL.</li>
+    <li><b>dbt-athena 1.x</b>, dans <code>dbt-adapters</code> : catalogue avec un schéma manquant (#2195), types complexes dans le DDL (#2211), entrées de catalogue inconnues (#2212).</li>
+  </ul>
+  <p>Toutes ces PR attendent encore une revue.</p>
+</section>
+
+<section>
+  <h2>Comment s'y préparer</h2>
+  <ol>
+    <li><b>Restez sur dbt-core 1.x et dbt-athena 1.11 en production.</b> Ils restent maintenus, et rien ne presse.</li>
+    <li><b>Lancez <code>dbt parse --use-v2-parser</code></b> avec dbt-core 1.12 : vous verrez ce que la sévérité de v2 refusera dans votre projet, sans rien changer.</li>
+    <li><b>Si vous utilisez Lake Formation</b>, testez vos tags et vos filtres sur la branche d'exécution dès qu'elle est mergée. C'est un des rares points où Athena diffère vraiment des autres adaptateurs.</li>
+    <li><b>Ne comptez pas sur le lignage par colonne</b> dans le moteur ouvert : il relève de l'offre sous licence.</li>
+    <li><b>Suivez #16252.</b> Un retour d'usage, surtout sur Lake Formation ou sur un gros catalogue Glue, est utile aux contributeurs. Les approbations de mainteneur sont le goulot.</li>
+  </ol>
+</section>
+
+<nav class="pager" aria-label="Module précédent et suivant"><a href="07-monorepo-ci-cd.html">← 7 · CI/CD</a><a href="09-environnements.html">9 · Environnements →</a></nav>
+<footer>
+  <span>David Banquet · Wavo · data platform AWS serverless : Python 3.12, dbt-core 1.12 et dbt-athena 1.11, DuckDB, Iceberg sur Athena, Claude sur Bedrock et Claude Code.</span>
+  <span>Chiffres mesurés en dev ou en prod entre août et octobre 2026. Aucune donnée client ni identifiant d'infrastructure ici. Retours bienvenus, surtout sur la partie Lake Formation.</span>
+</footer>
+</main>
+</body>
+</html>

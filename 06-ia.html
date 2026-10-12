@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>IA dans la chaîne data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F4F6F5; --surface:#FFFFFF; --ink:#13201D; --muted:#55645F; --rule:#D3DCD8;
+  --accent:#0B6E5F; --accent-soft:#DDEFEA; --warn:#A4471B; --warn-soft:#F6E5DB;
+  --bronze:#9A6A2F; --silver:#6F7C86; --gold:#B08A12;
+  --code-bg:#E8EDEB;
+  --display:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --body:"Source Serif 4", Georgia, "Times New Roman", serif;
+  --mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme:dark;
+    --ground:#0E1513; --surface:#151F1C; --ink:#E3ECE9; --muted:#97A8A2; --rule:#26332F;
+    --accent:#5CC9B4; --accent-soft:#16312B; --warn:#F09A6E; --warn-soft:#352015;
+    --bronze:#D3A266; --silver:#AAB6BF; --gold:#E2BE4A;
+    --code-bg:#1B2724;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ground);color:var(--ink);font:400 17px/1.65 var(--body);padding-inline:20px;padding-block:44px 88px}
+main{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:60px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0;line-height:1.12}
+h1{font-size:clamp(2.1rem,5.4vw,3.1rem);font-weight:800;letter-spacing:-.025em}
+h2{font-size:1.65rem;font-weight:700;letter-spacing:-.012em}
+h3{font-size:1.08rem;font-weight:700}
+p{margin:0}
+section{display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-direction:column;gap:18px}
+.eyebrow{font:500 .74rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.lede{font-size:1.18rem;color:var(--muted);max-width:62ch}
+code{font:400 .84em var(--mono);background:var(--code-bg);padding:.1em .35em;border-radius:4px}
+pre{margin:0;background:var(--code-bg);border-radius:8px;padding:14px 16px;overflow-x:auto;font:400 .82rem/1.55 var(--mono)}
+pre code{background:none;padding:0;font-size:inherit}
+ul,ol{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:8px}
+b{font-weight:600}
+.layers{display:flex;gap:6px;flex-wrap:wrap;font:500 .78rem/1 var(--mono)}
+.layers span{padding:6px 10px;border-radius:4px;border:1px solid var(--rule);background:var(--surface)}
+.layers .b{color:var(--bronze)} .layers .s{color:var(--silver)} .layers .g{color:var(--gold)}
+.table-wrap{overflow-x:auto;background:var(--surface);border:1px solid var(--rule);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:.93rem;font-family:var(--body)}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--rule);vertical-align:top}
+tr:last-child td{border-bottom:none}
+th{font:500 .72rem var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{font-family:var(--mono);font-size:.86rem;font-variant-numeric:tabular-nums;white-space:nowrap}
+.note{border-left:3px solid var(--accent);background:var(--accent-soft);padding:12px 16px;border-radius:0 8px 8px 0}
+.trap{border-left:3px solid var(--warn);background:var(--warn-soft);padding:12px 16px;border-radius:0 8px 8px 0;display:flex;flex-direction:column;gap:6px}
+.trap b{color:var(--warn)}
+.traps{display:flex;flex-direction:column;gap:12px}
+.kicker{font:700 .8rem/1 var(--display);letter-spacing:.04em;text-transform:uppercase;color:var(--accent)}
+footer{color:var(--muted);font-size:.92rem;border-top:1px solid var(--rule);padding-top:20px;display:flex;flex-direction:column;gap:8px}
+
+.topnav{position:sticky;top:0;z-index:5;background:var(--ground);border-bottom:1px solid var(--rule);margin-inline:-20px;padding:10px 20px;overflow-x:auto}
+.topnav ol{list-style:none;margin:0 auto;padding:0;display:flex;gap:4px;flex-direction:row;max-width:760px;white-space:nowrap;font:500 .8rem/1 var(--display)}
+.topnav a{display:block;padding:7px 10px;border-radius:6px;color:var(--muted);text-decoration:none}
+.topnav a:hover,.topnav a:focus-visible{color:var(--ink);background:var(--surface)}
+.topnav a[aria-current]{color:var(--accent);background:var(--accent-soft)}
+a{color:var(--accent)}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--surface);border:1px solid var(--rule);border-radius:10px;color:var(--ink);text-decoration:none}
+.card:hover,.card:focus-visible{border-color:var(--accent)}
+.card .n{font:800 1.4rem/1 var(--display);color:var(--accent)}
+.card span:last-child{color:var(--muted);font-size:.93rem}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.stat{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.stat .big{font:800 1.8rem/1 var(--display);font-variant-numeric:tabular-nums}
+.stat .lbl{color:var(--muted);font-size:.92rem}
+.pager{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font:500 .95rem var(--display)}
+.pager a{text-decoration:none}
+:root{--dv-before:#66C093;--dv-after:#207B54}
+@media (prefers-color-scheme: dark){:root{--dv-before:#1A754E;--dv-after:#47A87A}}
+figure{margin:0}
+.diagram{background:#FFFFFF;border:1px solid var(--rule);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+.diagram img{display:block;width:100%;height:auto}
+.diagram figcaption{color:#55645F;font:500 .85rem/1.4 var(--display);text-align:center}
+.dv{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.dv-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;font:500 .95rem var(--display);color:var(--ink)}
+.dv-legend{display:flex;gap:14px;color:var(--muted);font-size:.85rem}
+.dv-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.k-before{background:var(--dv-before)}.k-after{background:var(--dv-after)}
+.dv svg{width:100%;height:auto;font-family:var(--display);overflow:visible}
+.dv-grid{stroke:var(--rule);stroke-width:1}
+.dv-axis{fill:var(--muted);font-size:12px}
+.dv-label{fill:var(--ink);font-size:14px;font-weight:500}
+.dv-val{fill:var(--muted);font-size:13px;font-variant-numeric:tabular-nums}
+.dv-strong{fill:var(--ink);font-weight:700}
+.dv-link{stroke:var(--dv-before);stroke-width:2}
+.dv-before{fill:var(--dv-before);stroke:var(--surface);stroke-width:2}
+.dv-after{fill:var(--dv-after);stroke:var(--surface);stroke-width:2}
+.dv-hit{fill:transparent}
+.dv-row:hover .dv-hit,.dv-row:focus .dv-hit{fill:var(--accent-soft)}
+.dv-row:focus{outline:none}
+.dv-foot{margin:0;color:var(--muted);font-size:.85rem}
+@media (max-width:640px){
+  .diagram{overflow-x:auto}
+  .diagram img{min-width:720px}
+  .diagram figcaption{text-align:left}
+  .dv{overflow-x:auto}
+  .dv svg{min-width:560px}
+}
+.stats-2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+</style>
+</head>
+<body>
+<nav class="topnav" aria-label="Modules"><ol><li><a href="index.html">Sommaire</a></li><li><a href="01-migration-dbt.html">1 · Migration dbt</a></li><li><a href="02-gains.html">2 · Gains</a></li><li><a href="03-historize.html">3 · Historize</a></li><li><a href="04-merge.html">4 · Merge</a></li><li><a href="05-iceberg.html">5 · Iceberg</a></li><li><a href="06-ia.html" aria-current="page">6 · IA</a></li><li><a href="07-monorepo-ci-cd.html">7 · CI/CD</a></li><li><a href="08-dbt-v2.html">8 · dbt v2</a></li><li><a href="09-environnements.html">9 · Environnements</a></li></ol></nav>
+<main>
+<header>
+  <span class="eyebrow">Module 6 · Data et IA</span>
+  <h1>L'IA dans la chaîne de données</h1>
+  <p class="lede">Ce que les LLM font concrètement chez Wavo : catégoriser, extraire, aller chercher la donnée là où il n'y a pas d'API, répondre aux équipes métier, et travailler sur la plateforme elle-même. À chaque fois, la sortie du modèle entre dans le lakehouse comme n'importe quelle autre source : landing, puis bronze historisé.</p>
+</header>
+
+<section>
+  <h2>Catégoriser des transactions bancaires</h2>
+  <p>Une cascade en trois étapes, mergées dans cet ordre : <b>mots-clés</b> (un seed dbt), puis <b>un modèle Claude sur Bedrock</b> pour ce que les mots-clés n'ont pas couvert, puis <b>les corrections manuelles</b>. L'ordre fait la précédence : une proposition du modèle n'écrase jamais une correction humaine.</p>
+  <ul>
+    <li><b>L'unité de travail est le libellé distinct, pas la transaction.</b> Environ 350 000 lignes non catégorisées portaient 108 000 couples (libellé, signe). Un appel répond pour toutes les transactions qui partagent un libellé.</li>
+    <li><b>Les propositions sont stockées</b> et servent de cache : un libellé déjà vu ne coûte aucun appel. En régime de croisière, un run représente trois lots et une minute.</li>
+    <li><b>Un budget par organisation</b> (nombre de libellés par run), et <code>--no-cache</code> réservé au lendemain d'un changement de prompt.</li>
+    <li><b>Un seul chemin de code</b> : le script de backfill appelle les mêmes Lambdas que la Step Function. Il n'existe pas de version « outil » qui diverge de la prod.</li>
+  </ul>
+  <div class="trap"><b>Quand la regex tombe, la facture monte</b><span>Ma table de mots-clés s'est vidée (un seed écrit dans un bucket qui expire en un jour, module 5). Plus aucun mot-clé ne matchait, et toutes les nouvelles transactions partaient chez le modèle. Rien n'a cassé, c'est le coût qui a révélé le problème. Surveillez le taux de couverture de chaque étage de la cascade.</span></div>
+  <p>Détail Bedrock : certains modèles récents refusent un <code>toolChoice</code> forcé. Je suis passé en <code>auto</code>, avec une consigne explicite dans le prompt et une validation de la sortie.</p>
+</section>
+
+<section>
+  <h2>Des agents navigateur pour les ERP sans API</h2>
+  <p>Beaucoup de mes sources sont des ERP sans API exploitable. Un agent pilote un navigateur dans une tâche ECS : il se connecte, exporte le rapport et le dépose en landing. Le reste du pipeline ne voit pas la différence avec une autre source.</p>
+  <ul>
+    <li><b>Filtrer uniquement sur les dates à l'export</b>, et appliquer les filtres métier dans le silver. La plateforme garde ainsi une trace exhaustive de ce qui a été collecté.</li>
+    <li><b>Une garde sur les connexions</b> : plusieurs runs en parallèle sur le même compte client ont déjà provoqué six logins simultanés. Le pipeline vérifie l'URL, l'identifiant et le mot de passe avant chaque tentative.</li>
+    <li><b>Le jour où l'éditeur change son export</b>, les colonnes landing changent. Les nouvelles sont ajoutées automatiquement, mais une ancienne n'est retirée que si le lignage dbt prouve que plus aucun modèle ne la lit.</li>
+    <li><b>Le cache de prompt</b> : sur les longues sessions, j'élague les captures d'écran par blocs plutôt qu'une par une, pour ne pas invalider le cache à chaque étape.</li>
+  </ul>
+  <p class="note">Le lignage dbt devient ici une donnée de production. Le <code>manifest.json</code> publié par la CD est lu par le pipeline d'ingestion pour savoir quelles colonnes sont encore utilisées. Pensez-y si vous publiez déjà vos manifests : c'est un graphe de dépendances gratuit et toujours à jour.</p>
+</section>
+
+<section>
+  <h2>Extraire des documents</h2>
+  <p>Relevés bancaires, factures, liasses fiscales : des Lambdas d'extraction par LLM produisent des lignes typées (modèles Pydantic) qui entrent en landing puis en bronze, avec la même historisation que le reste. Les documents longs sont découpés en morceaux, et il faut ensuite recoller ce qui a été coupé : une facture répartie sur deux morceaux doit garder toutes ses lignes.</p>
+</section>
+
+<section>
+  <h2>Un MCP data pour les équipes métier</h2>
+  <p>Les commerciaux et les ops interrogent la donnée depuis Claude, via un serveur MCP maison. Trois choix de conception ont fait la différence :</p>
+  <ul>
+    <li><b>Un outil <code>get_context</code> à appeler avant tout SQL</b> : le périmètre, les tables, les conventions (montants en centimes, fuseau de Paris, fraîcheur des données).</li>
+    <li><b>Des outils dédiés pour les indicateurs canoniques</b> (encours, frais facturés, revenu récurrent, bilan) : le modèle ne réinvente jamais une formule. Le SQL libre reste possible pour le reste, en lecture seule et plafonné.</li>
+    <li><b>Un outil <code>report_data_feedback</code></b> : quand une question n'a pas pu être bien répondue, le modèle demande à l'utilisateur comment il a fini par trouver, et le remonte. C'est mon backlog de qualité de données, alimenté par l'usage.</li>
+  </ul>
+  <div class="trap"><b>Une réponse fausse est pire qu'une absence de réponse</b><span>La réplique lue par le MCP gardait des tables supprimées en prod : <code>pg_restore --clean</code> ne supprime que ce que le dump contient. Le modèle répondait avec des chiffres figés au jour de la suppression, sans la moindre erreur. Recréez la réplique de zéro, ou comparez régulièrement la liste de ses tables à celle de la source.</span></div>
+</section>
+
+<section>
+  <h2>Claude Code sur la plateforme</h2>
+  <p>La plus grande part du travail décrit dans ce dossier (migration dbt, bascule DuckDB, scripts de parité) a été faite avec Claude Code. Ce qui le rend utile sur une plateforme data :</p>
+  <ul>
+    <li><b>Un <code>CLAUDE.md</code> par zone du code</b> (lambdas, stacks, dbt, tests), qui ne contient que ce qui a déjà mordu et ne se voit pas dans le code.</li>
+    <li><b>Des skills</b> pour déployer, lancer un workflow, faire un smoke test sur un environnement éphémère, surveiller, diagnostiquer.</li>
+    <li><b>Un accès Athena par MCP</b>, et un wrapper de lecture prod qui ne peut pas écrire. Les écritures prod sont refusées par un hook et remises à un humain avec la commande exacte.</li>
+    <li><b>Des alertes qui lancent une session</b> : quand un job casse la nuit, l'alerte Slack ouvre une session Claude isolée sur une MicroVM. Elle diagnostique avec un accès prod en lecture seule, ouvre la tâche et propose une PR draft ; un humain relit et merge.</li>
+  </ul>
+  <p>Le détail de ce dernier point fait l'objet d'une page à part, « Les boucles de la Software Factory ». Je peux vous l'envoyer.</p>
+</section>
+
+<nav class="pager" aria-label="Module précédent et suivant"><a href="05-iceberg.html">← 5 · Iceberg</a><a href="07-monorepo-ci-cd.html">7 · CI/CD →</a></nav>
+<footer>
+  <span>David Banquet · Wavo · data platform AWS serverless : Python 3.12, dbt-core 1.12 et dbt-athena 1.11, DuckDB, Iceberg sur Athena, Claude sur Bedrock et Claude Code.</span>
+  <span>Chiffres mesurés en dev ou en prod entre août et octobre 2026. Aucune donnée client ni identifiant d'infrastructure ici. Retours bienvenus, surtout sur la partie Lake Formation.</span>
+</footer>
+</main>
+</body>
+</html>
